@@ -8,7 +8,6 @@ P01 (*) Find the last element of a list.
 my_last(A,[A]).
 my_last(X, [_|T],):- my_last(X,T).
 
-
 /*
 P02 (*) Find the last but one element of a list.
     (zweitletztes Element, l'avant-dernier élément)
