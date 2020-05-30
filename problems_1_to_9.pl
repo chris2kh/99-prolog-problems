@@ -93,7 +93,5 @@ pack(L1,L2):- reverse(L1,R1), iter(R1,[],L2).
 
 iter([],Z,Z).
 iter([H|T],[],Z):- iter(T,[[H]],Z),!.
-iter([H|T],[[A|B]|C],Z):- H \= A, append([[H]],[[A|B]|C],W), iter(T,W,Z).
-iter([H|T],[[H|B]|C],Z):- append([H],[H|B],W), iter(T,[W|C],Z).
-iter([H|T],[A|B],Z):- H \= A, append([[H]],[A|B],W), iter(T,W,Z).
-iter([H|T],[H|B],Z):- iter(T,[[H,H]|B],Z).
+iter([H|T],[[H|B]|C],Z):- iter(T,[[H,H|B]|C],Z).
+iter([H|T],[[A|B]|C],Z):- H \= A, iter(T,[[H],[A|B]|C],Z).
