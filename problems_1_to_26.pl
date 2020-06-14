@@ -215,3 +215,104 @@ P18 (**) Extract a slice from a list.
 
 slice(L,I,J,S):- In is I-1, split(L,In,_,X), 
                  K is J-I, Kn is K+1, split(X,Kn,S,_).
+
+/*
+P19 (**) Rotate a list N places to the left.
+    Examples:
+    ?- rotate([a,b,c,d,e,f,g,h],3,X).
+    X = [d,e,f,g,h,a,b,c]
+
+    ?- rotate([a,b,c,d,e,f,g,h],-2,X).
+    X = [g,h,a,b,c,d,e,f]
+*/
+
+
+split(L,0,[],L):-!.
+split([H|T],N,[H|Acc],Y):- M is N-1,split(T,M,Acc,Y).
+
+rotate(L,0,L):-!.
+rotate(L1,N,L2):- N > 0, length(L1,M), O is N mod M, split(L1,O,S1,S2), append(S2,S1,L2).
+rotate(L1,N,L2):- N < 0, length(L1,M), O is M+N, P is O mod M, rotate(L1,P,L2).
+
+
+/*
+P20 (*) Remove the K'th element from a list.
+    Example:
+    ?- remove_at(X,[a,b,c,d],2,R).
+    X = b
+    R = [a,c,d]
+*/
+
+remove_at(H,[H|T],1,T).
+remove_at(X,[H|T],N,[H|Y]):- N >1, M is N-1, remove_at(X,T,M,Y).
+
+/*
+P21 (*) Insert an element at a given position into a list.
+    Example:
+    ?- insert_at(alfa,[a,b,c,d],2,L).
+    L = [a,alfa,b,c,d]
+*/
+insert_at(E,L,1,[E|L]):-!.
+insert_at(E,[H|T],N,[H|X]):- M is N-1, insert_at(E,T,M,X).
+
+/*
+P22 (*) Create a list containing all integers within a given range.
+    Example:
+    ?- range(4,9,L).
+    L = [4,5,6,7,8,9]
+*/
+range(X,X,[X]):-!.
+range(X,Y,[X|T]):- X1 is X+1,range(X1,Y,T).
+
+/*
+P23 (**) Extract a given number of randomly selected elements from a list.
+    The selected items shall be put into a result list.
+    Example:
+    ?- rnd_select([a,b,c,d,e,f,g,h],3,L).
+    L = [e,d,a]
+*/
+rnd_select(_,0,[]).
+rnd_select([H],1,[H]):-!. /* random(1,1,R) does not work, so I had to include this special case to allow permutation to work (P25) */
+rnd_select(L,N,[X|Y]):- length(L,S), random(1,S,R),
+    remove_at(X,L,R,Z),
+    M is N-1,
+    rnd_select(Z,M,Y),!.
+
+/*
+P24 (*) Lotto: Draw N different random numbers from the set 1..M.
+    The selected numbers shall be put into a result list.
+    Example:
+    ?- rnd_select(6,49,L).
+    L = [23,1,17,33,21,37]
+
+    Hint: Combine the solutions of problems P22 and P23.
+*/
+
+lotto(N,M,L):- range(1,M,Lm), rnd_select(Lm,N,L).
+
+/*
+P25 (*) Generate a random permutation of the elements of a list.
+    Example:
+    ?- rnd_permu([a,b,c,d,e,f],L).
+    L = [b,a,d,c,e,f]
+
+    Hint: Use the solution of problem P23.
+*/
+
+rnd_permu(L,Lp):- length(L,S),rnd_select(L,S,Lp).
+
+/*    
+P26 (**) Generate the combinations of K distinct objects chosen from the N elements of a list
+    In how many ways can a committee of 3 be chosen from a group of 12 people? We all know that there are C(12,3) = 220 possibilities (C(N,K) denotes the well-known binomial coefficients). For pure mathematicians, this result may be great. But we want to really generate all the possibilities (via backtracking).
+
+    Example:
+    ?- combination(3,[a,b,c,d,e,f],L).
+    L = [a,b,c] ;
+    L = [a,b,d] ;
+    L = [a,b,e] ;
+    ... 
+*/
+combination(1,[H|_],[H]).
+combination(1,[_|T],X):- combination(1,T,X).
+combination(N,[H|T],[H|X]):- N > 1, Nr is N-1, combination(Nr,T,X).
+combination(N,[_|T],X):- N > 1, combination(N,T,X).
