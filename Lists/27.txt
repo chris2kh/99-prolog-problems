@@ -1,0 +1,37 @@
+/* P27 (**) Group the elements of a set into disjoint subsets.
+    a) In how many ways can a group of 9 people work in 3 disjoint subgroups of 2, 3 and 4 persons? Write a predicate that generates all the possibilities via backtracking.
+
+    Example:
+    ?- group3([aldo,beat,carla,david,evi,flip,gary,hugo,ida],G1,G2,G3).
+    G1 = [aldo,beat], G2 = [carla,david,evi], G3 = [flip,gary,hugo,ida]
+    ...
+
+    b) Generalize the above predicate in a way that we can specify a list of group sizes and the predicate will return a list of groups.
+
+    Example:
+    ?- group([aldo,beat,carla,david,evi,flip,gary,hugo,ida],[2,2,5],Gs).
+    Gs = [[aldo,beat],[carla,david],[evi,flip,gary,hugo,ida]]
+    ...
+
+    Note that we do not want permutations of the group members; i.e. [[aldo,beat],...] is the same solution as [[beat,aldo],...]. However, we make a difference between [[aldo,beat],[carla,david],...] and [[carla,david],[aldo,beat],...].
+
+    You may find more about this combinatorial problem in a good book on discrete mathematics under the term "multinomial coefficients".*/
+
+combination(1,[H|_],[H]).
+combination(1,[_|T],X):- combination(1,T,X).
+combination(N,[H|T],[H|X]):- N > 1, Nr is N-1, combination(Nr,T,X).
+combination(N,[_|T],X):- N > 1, combination(N,T,X).
+
+removeElement(_,[],[]).
+removeElement(H,[H|T],T).
+removeElement(X,[H|T],[H|Y]):- X \= H, removeElement(X,T,Y).
+
+minus(L,[],L).
+minus(L,[H|T],R):- removeElement(H,L,Z), minus(Z,T,R).
+
+
+group3(L,G1):- combination(5,L,G1), minus(L,G1,R1),
+    combination(2,R1,G2), minus(R1,G2,G3).
+
+group(L,[N1,N2,_],[G1,G2,G3]):- combination(N1,L,G1), minus(L,G1,R1),
+        combination(N2,R1,G2), minus(R1,G2,G3).

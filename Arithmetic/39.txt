@@ -1,0 +1,22 @@
+even(X):- 0 is X mod 2.
+
+not_div(_,N,Limit):- N > Limit,!.
+not_div(X,N,Limit):- N =< Limit, \+ 0 is X mod N, N2 is N+2, not_div(X,N2,Limit).
+
+is_prime(X):- X =< 3,!.
+is_prime(X):- X > 3, \+even(X), Limit is round(sqrt(X)), not_div(X,3,Limit).
+
+next_prime(2,3).
+next_prime(X,Y):- even(X),Z is X-1, next_prime(Z,Y),!.
+next_prime(X,Y):- Y is X+2, is_prime(Y),!.
+next_prime(X,Y):- Z is X+2, next_prime(Z,Y)
+
+
+
+/* P39 (*) A list of prime numbers.
+    Given a range of integers by its lower and upper limit, construct a list of all prime numbers in that range.
+*/
+
+primes(A,B,[]):- A > B,!.
+primes(A,B,[X|Y]):- \+is_prime(A),next_prime(A,X),primes(X,B,Y).
+primes(A,B,[A|Y]):- is_prime(A), next_prime(A,X),primes(X,B,Y).

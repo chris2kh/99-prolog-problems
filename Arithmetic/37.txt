@@ -1,0 +1,44 @@
+even(X):- 0 is X mod 2.
+
+not_div(_,N,Limit):- N > Limit,!.
+not_div(X,N,Limit):- N =< Limit, \+ 0 is X mod N, N2 is N+2, not_div(X,N2,Limit).
+
+is_prime(X):- X =< 3,!.
+is_prime(X):- X > 3, \+even(X), Limit is round(sqrt(X)), not_div(X,3,Limit).
+
+next_prime(2,3).
+next_prime(X,Y):- even(X),Z is X-1, next_prime(Z,Y),!.
+next_prime(X,Y):- Y is X+2, is_prime(Y),!.
+next_prime(X,Y):- Z is X+2, next_prime(Z,Y).
+
+
+prime_factors(N,L):- get_primes(N,L,2).
+
+get_primes(1,[],_).
+get_primes(N,[Prime|T],Prime):- 0 is N mod Prime, Q is N / Prime, get_primes(Q,T,Prime),!.
+get_primes(N,L,Prime):- \+0 is N mod Prime, next_prime(Prime,Next), get_primes(N,L,Next),!.
+
+
+count(E,[],[],[E,0]):-!.
+count(E,[H|T],[H|T],[E,0]):-E \= H,!.
+count(E,[E|T],L2,[E,1]):-count(E,T,L2,[E,0]),!.
+count(E,[E|T],L2,[E,N]):- count(E,T,L2,[E,M]), N is M+1.
+
+encode([],[]).
+encode([H|T],[X|Y]):-count(H,[H|T],Z,X), encode(Z,Y).
+
+prime_factors_mult(N,L):- prime_factors(N,X), encode(X,L),!.
+
+/* P37 (**) Calculate Euler's totient function phi(m) (improved).
+    See problem P34 for the definition of Euler's totient function. If the list of the prime factors of a number m is known in the form of problem P36 then the function phi(m) can be efficiently calculated as follows: Let [[p1,m1],[p2,m2],[p3,m3],...] be the list of prime factors (and their multiplicities) of a given number m. Then phi(m) can be calculated with the following formula:
+
+    phi(m) = (p1 - 1) * p1**(m1 - 1) * (p2 - 1) * p2**(m2 - 1) * (p3 - 1) * p3**(m3 - 1) * ...
+
+    Note that a**b stands for the b'th power of a.
+*/
+
+phi2(N,X):- prime_factors_mult(N,L), productory(L,1,X).
+
+productory([],Result,Result).
+productory([[Pi,Mi]|T],Acc,Result):- Current is (Pi-1)*Pi**(Mi-1),Next is Current*Acc,
+    productory(T,Next,Result).

@@ -1,0 +1,72 @@
+even(X):- 0 is X mod 2.
+
+not_div(_,N,Limit):- N > Limit,!.
+not_div(X,N,Limit):- N =< Limit, \+ 0 is X mod N, N2 is N+2, not_div(X,N2,Limit).
+
+is_prime(X):- X =< 3,!.
+is_prime(X):- X > 3, \+even(X), Limit is round(sqrt(X)), not_div(X,3,Limit).
+
+next_prime(2,3).
+next_prime(X,Y):- even(X),Z is X-1, next_prime(Z,Y),!.
+next_prime(X,Y):- Y is X+2, is_prime(Y),!.
+next_prime(X,Y):- Z is X+2, next_prime(Z,Y).
+
+
+prime_factors(N,L):- get_primes(N,L,2).
+
+get_primes(1,[],_).
+get_primes(N,[Prime|T],Prime):- 0 is N mod Prime, Q is N / Prime, get_primes(Q,T,Prime),!.
+get_primes(N,L,Prime):- \+0 is N mod Prime, next_prime(Prime,Next), get_primes(N,L,Next),!.
+
+
+count(E,[],[],[E,0]):-!.
+count(E,[H|T],[H|T],[E,0]):-E \= H,!.
+count(E,[E|T],L2,[E,1]):-count(E,T,L2,[E,0]),!.
+count(E,[E|T],L2,[E,N]):- count(E,T,L2,[E,M]), N is M+1.
+
+encode([],[]).
+encode([H|T],[X|Y]):-count(H,[H|T],Z,X), encode(Z,Y).
+
+ prime_factors_mult(N,L):- prime_factors(N,X), encode(X,L),!.
+
+phi2(N,X):- prime_factors_mult(N,L), productory(L,1,X).
+
+productory([],Result,Result).
+productory([[Pi,Mi]|T],Acc,Result):- Current is (Pi-1)*Pi**(Mi-1),Next is Current*Acc,
+    productory(T,Next,Result).
+
+primes(A,B,[]):- A > B,!.
+primes(A,B,[X|Y]):- \+is_prime(A),next_prime(A,X),primes(X,B,Y).
+primes(A,B,[A|Y]):- is_prime(A), next_prime(A,X),primes(X,B,Y).
+
+goldbach(N,X+Y):- N>2, 0 is N mod 2, primes(1,N,L),member(X,L),Y is N-X, member(Y,L), X < Y.
+
+/* P41 (**) A list of Goldbach compositions.
+    Given a range of integers by its lower and upper limit, print a list of all even numbers and their Goldbach composition.
+
+    Example:
+    ?- goldbach_list(9,20).
+    10 = 3 + 7
+    12 = 5 + 7
+    14 = 3 + 11
+    16 = 3 + 13
+    18 = 5 + 13
+    20 = 3 + 17
+
+    In most cases, if an even number is written as the sum of two prime numbers, one of them is very small. Very rarely, the primes are both bigger than say 50. Try to find out how many such cases there are in the range 2..3000.
+
+    Example (for a print limit of 50):
+    ?- goldbach_list(1,2000,50).
+    992 = 73 + 919
+    1382 = 61 + 1321
+    1856 = 67 + 1789
+    1928 = 61 + 1867
+*/
+
+
+
+goldbach_list(A,B,L,U):- A =< 2,goldbach_list(4,B,L,U),!.
+goldbach_list(A,B,[],_):-A>B,!.
+goldbach_list(A,B,[A=X|Y],U):- 0 is A mod 2, goldbach(A,X), X = X1+X2,X1>U,X2>U, Next is A+2,goldbach_list(Next,B,Y,U).
+goldbach_list(A,B,L,U):- 0 is A mod 2, goldbach(A,X), X = X1+X2,X1=<U,X2=<U, Next is A+2,goldbach_list(Next,B,L,U).
+goldbach_list(A,B,L,U):- 1 is A mod 2, Next is A+1,goldbach_list(Next,B,L,U).

@@ -1,0 +1,27 @@
+/*P35 (**) Determine the prime factors of a given positive integer.
+    Construct a flat list containing the prime factors in ascending order.
+    Example:
+    ?- prime_factors(315, L).
+    L = [3,3,5,7]
+*/
+
+
+even(X):- 0 is X mod 2.
+
+not_div(_,N,Limit):- N > Limit,!.
+not_div(X,N,Limit):- N =< Limit, \+ 0 is X mod N, N2 is N+2, not_div(X,N2,Limit).
+
+is_prime(X):- X =< 3,!.
+is_prime(X):- X > 3, \+even(X), Limit is round(sqrt(X)), not_div(X,3,Limit).
+
+next_prime(2,3).
+next_prime(X,Y):- even(X),Z is X-1, next_prime(Z,Y),!.
+next_prime(X,Y):- Y is X+2, is_prime(Y),!.
+next_prime(X,Y):- Z is X+2, next_prime(Z,Y).
+
+
+prime_factors(N,L):- get_primes(N,L,2).
+
+get_primes(1,[],_).
+get_primes(N,[Prime|T],Prime):- 0 is N mod Prime, Q is N / Prime, get_primes(Q,T,Prime),!.
+get_primes(N,L,Prime):- \+0 is N mod Prime, next_prime(Prime,Next), get_primes(N,L,Next),!.

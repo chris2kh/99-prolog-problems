@@ -1,0 +1,50 @@
+/*
+P28 (**) Sorting a list of lists according to length of sublists
+    a) We suppose that a list (InList) contains elements that are lists themselves. The objective is to sort the elements of InList according to their length. E.g. short lists first, longer lists later, or vice versa.
+
+    Example:
+    ?- lsort([[a,b,c],[d,e],[f,g,h],[d,e],[i,j,k,l],[m,n],[o]],L).
+    L = [[o], [d, e], [d, e], [m, n], [a, b, c], [f, g, h], [i, j, k, l]]
+
+    b) Again, we suppose that a list (InList) contains elements that are lists themselves. But this time the objective is to sort the elements of InList according to their length frequency; i.e. in the default, where sorting is done ascendingly, lists with rare lengths are placed first, others with a more frequent length come later.
+
+    Example:
+    ?- lfsort([[a,b,c],[d,e],[f,g,h],[d,e],[i,j,k,l],[m,n],[o]],L).
+    L = [[i, j, k, l], [o], [a, b, c], [f, g, h], [d, e], [d, e], [m, n]]
+
+    Note that in the above example, the first two lists in the result L have length 4 and 1, both lengths appear just once. The third and forth list have length 3 which appears, there are two list of this length. And finally, the last three lists have length 2. This is the most frequent length. 
+
+*/
+
+
+insert(X,[],[X]).
+insert(X,[H|T],[X,H|T]):- length(X,X1),length(H,Y1), X1 =< Y1.
+insert(X,[H|T],[H|Z]):- length(X,X1),length(H,Y1), X1 > Y1, insert(X,T,Z).
+
+lsort([],[]).
+lsort([H|T],L):- lsort(T,X), insert(H,X,L).
+
+
+frequency(_,0,[]).
+frequency(L,N,[H|T]):- length(L,A),length(H,B), A == B, frequency(L,Nr,T),N is Nr+1.
+frequency(L,N,[H|T]):- length(L,A),length(H,B), A \= B, frequency(L,N,T).
+
+pack(H,N,[H,N]).
+packFrequency([],_,[]).
+packFrequency([H|T],L,[X|Y]):- frequency(H,N,L), pack(H,N,X), packFrequency(T,L,Y).
+
+packFrequency(L,X):- packFrequency(L,L,X).
+
+lengthf([_,N],N).
+
+insertf(X,[],[X]).
+insertf(X,[H|T],[X,H|T]):- lengthf(X,X1),lengthf(H,Y1), X1 =< Y1.
+insertf(X,[H|T],[H|Z]):- lengthf(X,X1),lengthf(H,Y1), X1 > Y1, insertf(X,T,Z).
+
+fSort([],[]).
+fSort([H|T],L):- fSort(T,X), insertf(H,X,L).
+
+unpackFrequency([],[]).
+unpackFrequency([[X,_]|T],[X|Y]):- unpackFrequency(T,Y).
+
+lfsort(L,R):- packFrequency(L,X), fSort(X,Z), unpackFrequency(Z,R).
