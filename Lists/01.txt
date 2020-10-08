@@ -1,0 +1,9 @@
+/*
+P01 (*) Find the last element of a list.
+    Example:
+    ?- my_last([a,b,c,d],X).
+    X = d
+*/
+
+my_last(A,[A]).
+my_last(X, [_|T],):- my_last(X,T).

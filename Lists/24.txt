@@ -1,0 +1,21 @@
+range(X,X,[X]):-!.
+range(X,Y,[X|T]):- X1 is X+1,range(X1,Y,T).
+
+rnd_select(_,0,[]).
+rnd_select([H],1,[H]):-!. /* random(1,1,R) does not work, so I had to include this special case to allow permutation to work (P25) */
+rnd_select(L,N,[X|Y]):- length(L,S), random(1,S,R),
+    remove_at(X,L,R,Z),
+    M is N-1,
+    rnd_select(Z,M,Y),!.
+
+/*
+P24 (*) Lotto: Draw N different random numbers from the set 1..M.
+    The selected numbers shall be put into a result list.
+    Example:
+    ?- rnd_select(6,49,L).
+    L = [23,1,17,33,21,37]
+
+    Hint: Combine the solutions of problems P22 and P23.
+*/
+
+lotto(N,M,L):- range(1,M,Lm), rnd_select(Lm,N,L).

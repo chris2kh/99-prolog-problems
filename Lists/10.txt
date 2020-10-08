@@ -1,0 +1,20 @@
+pack(L1,L2):- reverse(L1,R1), iter(R1,[],L2).
+
+iter([],Z,Z).
+iter([H|T],[],Z):- iter(T,[[H]],Z),!.
+iter([H|T],[[H|B]|C],Z):- iter(T,[[H,H|B]|C],Z).
+iter([H|T],[[A|B]|C],Z):- H \= A, iter(T,[[H],[A|B]|C],Z).
+
+/*
+P10 (*) Run-length encoding of a list.
+    Use the result of problem P09 to implement the so-called run-length encoding data compression method. Consecutive duplicates of elements are encoded as terms [N,E] where N is the number of duplicates of the element E.
+
+    Example:
+    ?- encode([a,a,a,a,b,c,c,a,a,d,e,e,e,e],X).
+    X = [[4,a],[1,b],[2,c],[2,a],[1,d][4,e]]
+*/
+
+encode(L1,L2):-pack(L1,P1), myEncode(P1,L2).
+head([H|_],H).
+myEncode([],[]).
+myEncode([H|T],[[N,E]|X]):- length(H,N), head(H,E), myEncode(T,X)

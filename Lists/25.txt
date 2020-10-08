@@ -1,0 +1,17 @@
+rnd_select(_,0,[]).
+rnd_select([H],1,[H]):-!. /* random(1,1,R) does not work, so I had to include this special case to allow permutation to work (P25) */
+rnd_select(L,N,[X|Y]):- length(L,S), random(1,S,R),
+    remove_at(X,L,R,Z),
+    M is N-1,
+    rnd_select(Z,M,Y),!.
+
+/*
+P25 (*) Generate a random permutation of the elements of a list.
+    Example:
+    ?- rnd_permu([a,b,c,d,e,f],L).
+    L = [b,a,d,c,e,f]
+
+    Hint: Use the solution of problem P23.
+*/
+
+rnd_permu(L,Lp):- length(L,S),rnd_select(L,S,Lp).

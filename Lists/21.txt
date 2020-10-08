@@ -1,0 +1,8 @@
+/*
+P21 (*) Insert an element at a given position into a list.
+    Example:
+    ?- insert_at(alfa,[a,b,c,d],2,L).
+    L = [a,alfa,b,c,d]
+*/
+insert_at(E,L,1,[E|L]):-!.
+insert_at(E,[H|T],N,[H|X]):- M is N-1, insert_at(E,T,M,X).

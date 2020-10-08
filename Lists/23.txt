@@ -1,0 +1,13 @@
+/*
+P23 (**) Extract a given number of randomly selected elements from a list.
+    The selected items shall be put into a result list.
+    Example:
+    ?- rnd_select([a,b,c,d,e,f,g,h],3,L).
+    L = [e,d,a]
+*/
+rnd_select(_,0,[]).
+rnd_select([H],1,[H]):-!. /* random(1,1,R) does not work, so I had to include this special case to allow permutation to work in problem P25 */
+rnd_select(L,N,[X|Y]):- length(L,S), random(1,S,R),
+    remove_at(X,L,R,Z),
+    M is N-1,
+    rnd_select(Z,M,Y),!.

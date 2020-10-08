@@ -1,0 +1,13 @@
+/*
+P16 (**) Drop every N'th element from a list.
+    Example:
+    ?- drop([a,b,c,d,e,f,g,h,i,k],3,X).
+    X = [a,b,d,e,g,h,k]
+*/
+
+drop([H|T],N,X):- iter(H,T,N,N,X).
+
+iter(_,[],1,_,[]):-!.
+iter(H,[],_,_,[H]):-!.
+iter(_,[A|B],1,M,Acc):- iter(A,B,M,M,Acc),!.
+iter(H,[A|B],N,M,[H|Acc]):- Nn is N-1, iter(A,B,Nn,M,Acc).

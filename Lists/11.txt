@@ -1,0 +1,21 @@
+pack(L1,L2):- reverse(L1,R1), iter(R1,[],L2).
+
+iter([],Z,Z).
+iter([H|T],[],Z):- iter(T,[[H]],Z),!.
+iter([H|T],[[H|B]|C],Z):- iter(T,[[H,H|B]|C],Z).
+iter([H|T],[[A|B]|C],Z):- H \= A, iter(T,[[H],[A|B]|C],Z).
+
+/*
+P11 (*) Modified run-length encoding.
+    Modify the result of problem P10 in such a way that if an element has no duplicates it is simply copied into the result list. Only elements with duplicates are transferred as [N,E] terms.
+
+    Example:
+    ?- encode_modified([a,a,a,a,b,c,c,a,a,d,e,e,e,e],X).
+    X = [[4,a],b,[2,c],[2,a],d,[4,e]]
+*/
+
+encode(L1,L2):-pack(L1,P1), myEncode(P1,L2).
+head([H|_],H).
+myEncode([],[]).
+myEncode([H|T], [E|X]):- length(H,1), head(H,E), myEncode(T,X),!.
+myEncode([H|T],[[N,E]|X]):- length(H,N), head(H,E), myEncode(T,X).

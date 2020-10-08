@@ -1,0 +1,11 @@
+/*
+P12 (**) Decode a run-length encoded list.
+    Given a run-length code list generated as specified in problem P11. Construct its uncompressed version.
+*/
+
+multi(1,E,[E]):-!.
+multi(N,E,[E|X]):- M is N-1, multi(M,E,X).
+
+decode([],[]).
+decode([H|T],[H|X]):- \+ is_list(H), decode(T,Td), flatten(Td,X).
+decode([[N,E]|T], L):- multi(N,E,H), decode(T,Td), flatten([H|Td],L).
