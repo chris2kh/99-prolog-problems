@@ -135,7 +135,7 @@ __65__.   (**)  ~~Layout a binary tree (2)~~
  
 __66__.   (***)  ~~Layout a binary tree (3)~~
  
-__67__.   (**)  ~~A string representation of binary trees~~
+__67__.   (**)  A string representation of binary trees
 
 __68__.   (**)  Preorder and inorder sequences of binary trees
 
