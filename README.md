@@ -93,9 +93,9 @@ __41__.   (**)  ~~A list of Goldbach compositions.~~
  
 __46__.   (**)  ~~Truth tables for logical expressions.~~
  
-__47__.   (*)  ~~Truth tables for logical expressions (2).~~
+__47__.   (*)  Truth tables for logical expressions (2).
   
-__48__.   (**)  ~~Truth tables for logical expressions (3).~~
+__48__.   (**)  Truth tables for logical expressions (3).
  
 __49__.   (**)  Gray code.
  
