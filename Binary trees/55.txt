@@ -1,0 +1,17 @@
+/*
+P55 (**) Construct completely balanced binary trees
+    In a completely balanced binary tree, the following property holds for every node: The number of nodes in its left subtree and the number of nodes in its right subtree are almost equal, which means their difference is not greater than one.
+
+    Write a predicate cbal_tree/2 to construct completely balanced binary trees for a given number of nodes. The predicate should generate all solutions via backtracking. Put the letter 'x' as information into all nodes of the tree.
+    Example:
+    ?- cbal_tree(4,T).
+    T = t(x, t(x, nil, nil), t(x, nil, t(x, nil, nil))) ;
+    T = t(x, t(x, nil, nil), t(x, t(x, nil, nil), nil)) ;
+    etc......No
+*/
+
+split(N,NL,NR):- M is N-1, NR is M//2, NL is M-NR.
+split(N,NL,NR):- M is N-1, 1 is M mod 2, NL is M//2, NR is M-NL.
+
+cbal_tree(0,nil).
+cbal_tree(N,T):- N>0, T = t(x,L,R), split(N,NL,NR), cbal_tree(NL,L), cbal_tree(NR,R)

@@ -1,0 +1,92 @@
+/*
+P66 (***) Layout a binary tree (3)
+    Yet another layout strategy is shown in the illustration opposite. The method yields a very compact layout while maintaining a certain symmetry in every node. Find out the rules and write the corresponding Prolog predicate. Hint: Consider the horizontal distance between a node and its successor nodes. How tight can you pack together two subtrees to construct the combined binary tree?
+
+    Use the same conventions as in problem P64 and P65 and test your predicate in an appropriate way. Note: This is a difficult problem. Don't give up too early!
+
+    Which layout do you like most? 
+*/
+
+/* This was a very difficult problem. The code below works but it is not written very nicely, even by prolog standards!
+    It definitely needs some cleaning and refactoring!
+*/
+
+maxHeight(nil,0).
+maxHeight(t(_,L,R),H):- maxHeight(L,Hl),maxHeight(R,Hr), Hl >= Hr , H is 1+Hl,!.
+maxHeight(t(_,L,R),H):- maxHeight(L,Hl),maxHeight(R,Hr), Hl <  Hr , H is 1+Hr.
+
+layout(T,PT):- maxHeight(T,H), aux(T,PT,H,0,1,_).
+
+aux(t(W,nil,R),t(W,1,Y,nil,R),_,0,Y,1):-!.
+aux(nil,nil,_,_,_,0).
+aux(t(W,L,R), t(W,X,Y,Lr,Rr),H,0,Y,X):- Ynext is Y+1, Hnext is H-1,
+    aux(L,Lr,Hnext,0,Ynext,Xl), X is  Xl + 2**(Hnext-1),
+    aux(R,Rr,H,X,Ynext,_),!.
+aux(t(W,L,R), t(W,X,Y,Lr,Rr),H,Down,Y,X):- Ynext is Y+1, Hnext is H-1,
+    aux(L,Lr,Hnext,Down,Ynext,_), X is 2**(Hnext-1) + Down,
+    aux(R,Rr,Hnext,X,Ynext,_).
+
+
+x_offset(X,0,X):-!.
+x_offset(X,X_parent,X):- Offset is (X_parent - X)/2, abs(Offset,A),A < 1,!.
+x_offset(X,X_parent,Xp):- Offset is(X_parent- X)/2, abs(Offset,A),A >=1,
+    Xp is X + Offset.
+
+
+propagate(nil,_,nil).
+propagate(t(W,X,Y,L,R),Diff, t(W,Xp,Y,Lp,Rp)):- Xp is X+Diff, propagate(L,Diff,Lp),
+    propagate(R,Diff,Rp).
+
+
+solution(T,S):- layout(T,Tl), shrink1(Tl,S).
+
+shrink1(T,S):- shrink(T,T,0), minX(T,X), Delta is X -1,
+    updateIndex(T,Delta,S),!.
+shrink1(T,S):- shrink(T,Algo,0), shrink1(Algo,S).
+
+
+shrink(nil,nil,_).
+shrink(t(W,X,Y,L,R),t(W,Xp,Y,Lp,Rp),X_parent):-
+       x_offset(X,X_parent,Xp), shrink(L,Ls,X), shrink(R,Rs,X),
+       Diff is Xp - X, propagate(Ls,Diff,Lp), propagate(Rs,Diff,Rp),
+      dont_touch(t(W,Xp,Y,Lp,Rp)).
+shrink(t(W,X,Y,L,R),t(W,X,Y,L,R),X_parent):-
+       x_offset(X,X_parent,Xp), shrink(L,Ls,X), shrink(R,Rs,X),
+       Diff is Xp - X, propagate(Ls,Diff,Lp), propagate(Rs,Diff,Rp),
+      \+dont_touch(t(W,Xp,Y,Lp,Rp)).
+
+
+ma(X,nil,X):- !.
+ma(nil,X,X):- !.
+ma(Xl,Xr,Xl):- Xl >= Xr,!.
+ma(_,Xr,Xr).
+
+most_right_at(_,_,nil,nil).
+most_right_at(Level,Level,t(_,X,_,_,_),X):- !.
+most_right_at(Curr,Level,t(_,_,_,L,R),Xp):- Next is Curr+1,most_right_at(Next,Level,L,Xl),
+    most_right_at(Next,Level,R,Xr), ma(Xl,Xr,Xp).
+
+mi(X,nil,X):- !.
+mi(nil,X,X):- !.
+mi(Xl,Xr,Xl):- Xl =< Xr,!.
+mi(_,Xr,Xr).
+
+most_left_at(_,_,nil,nil).
+most_left_at(Level,Level,t(_,X,_,_,_),X):- !.
+most_left_at(Curr,Level,t(_,_,_,L,R),Xp):-  Next is Curr+1,most_left_at(Next,Level,L,Xl),
+    most_left_at(Next,Level,R,Xr), mi(Xl,Xr,Xp).
+
+
+dont_touch(T):- dont_touch_at(1,T).
+dont_touch_at(Level,t(_,_,_,L,R)):- most_right_at(1,Level,L,Xl), most_left_at(1,Level,R,Xr),
+    (Xl = nil; Xr=nil),!.
+dont_touch_at(Level,t(_,_,_,L,R)):- most_right_at(1,Level,L,Xl),most_left_at(1,Level,R,Xr),
+    Xl \= Xr, Next is Level+1, dont_touch_at(Next,t(_,_,_,L,R)).
+
+minX(nil,nil).
+minX(t(_,X,_,nil,_),X).
+minX(t(_,_,_,L,R), Min):- minX(L,Lmin), minX(R, Rmin), mi(Lmin,Rmin,Min),!.
+
+updateIndex(nil,_,nil).
+updateIndex(t(W,X,Y,L,R),Delta, t(W,Xp,Y,Lp,Rp)):- Xp is X - Delta, updateIndex(L,Delta,Lp),
+    updateIndex(R,Delta,Rp).

@@ -1,0 +1,58 @@
+/*
+P60 (**) Construct height-balanced binary trees with a given number of nodes
+    Consider a height-balanced binary tree of height H. What is the maximum number of nodes it can contain?
+    Clearly, MaxN = 2**H - 1. However, what is the minimum number MinN? This question is more difficult. Try to find a recursive statement and turn it into a predicate minNodes/2 defined as follwos:
+
+    % minNodes(H,N) :- N is the minimum number of nodes in a height-balanced binary tree of height H.
+    (integer,integer), (+,?)
+
+    On the other hand, we might ask: what is the maximum height H a height-balanced binary tree with N nodes can have?
+
+    % maxHeight(N,H) :- H is the maximum height of a height-balanced binary tree with N nodes
+    (integer,integer), (+,?)
+
+    Now, we can attack the main problem: construct all the height-balanced binary trees with a given nuber of nodes.
+
+    % hbal_tree_nodes(N,T) :- T is a height-balanced binary tree with N nodes.
+
+    Find out how many height-balanced trees exist for N = 15.
+*/
+
+% 60a
+minNodes(0,0).
+minNodes(1,1).
+minNodes(H,N):- H>0, Hl is H-1, Hr is H-2, minNodes(Hl,Nl), minNodes(Hr,Nr),
+    N is 1 + Nl + Nr.
+
+%60b
+maxNodes(H,N):- N is 2**H-1.
+
+
+not(X):- \+X.
+maxHeight(N,H):- maxH(N,0,H).
+maxH(N,Acc,Acc):- minNodes(Acc,Nmin), maxNodes(Acc,Nmax), between(Nmin,Nmax,N),
+     Next is Acc+1, not(maxH(N,Next,Next)),!.
+maxH(N,Acc,Next):- minNodes(Acc,Nmin), maxNodes(Acc,Nmax), between(Nmin,Nmax,N),
+    Next is Acc+1, maxH(N,Next,Next), !.
+maxH(N,Acc,H):- minNodes(Acc,Nmin), N > Nmin, Next is Acc+1, maxH(N,Next,H).
+
+minHeight(N,H):- minH(N,0,H).
+minH(N,Acc,Acc):- minNodes(Acc,Nmin), maxNodes(Acc,Nmax), between(Nmin,Nmax,N),!.
+minH(N,Acc,H):- Next is Acc+1, minH(N,Next,H).
+
+%60c
+
+next_level(1,0,0):-!.
+next_level(H,HL,HR):- HL is H-1, HR is H-1.
+next_level(H,HL,HR):- HL is H-1, HR is H-2.
+next_level(H,HL,HR):- HL is H-2, HR is H-1.
+
+hbal_tree(0,nil,0).
+hbal_tree(H,t(x,L,R),Nodes):- H>0, next_level(H,HL,HR),hbal_tree(HL,L,NodesL), hbal_tree(HR,R,NodesR),
+    Nodes is 1 + NodesL + NodesR.
+
+hbal_tree_nodes(N,T):- maxHeight(N,H), hbal_tree(H,T,N).
+hbal_tree_nodes(N,T):- minHeight(N,Hmin), maxHeight(N,Hmax), Hmin \= Hmax, hbal_tree(Hmin,T,N).
+
+
+count_hbal(N,C):- setof(T,hbal_tree_nodes(N,T),Ts), length(Ts,C). 

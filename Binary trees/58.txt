@@ -1,0 +1,28 @@
+split(N,NL,NR):- M is N-1, NR is M//2, NL is M-NR.
+split(N,NL,NR):- M is N-1, 1 is M mod 2, NL is M//2, NR is M-NL.
+
+cbal_tree(0,nil).
+cbal_tree(N,T):- N>0, T = t(x,L,R), split(N,NL,NR), cbal_tree(NL,L), cbal_tree(NR,R)
+
+/*
+P58 (**) Generate-and-test paradigm
+    Apply the generate-and-test paradigm to construct all symmetric, completely balanced binary trees with a given number of nodes. Example:
+    ?- sym_cbal_trees(5,Ts).
+    Ts = [t(x, t(x, nil, t(x, nil, nil)), t(x, t(x, nil, nil), nil)), t(x, t(x, t(x, nil, nil), nil), t(x, nil, t(x, nil, nil)))]
+
+    How many such trees are there with 57 nodes? Investigate about how many solutions there are for a given number of nodes? What if the number is even? Write an appropriate predicate.
+*/
+
+sym_cbal_tree(N,T):-cbal_tree(N,T), is_mirror(T).
+sym_cbal_trees(N,L):- setof(T,sym_cbal_tree(N,T),L).
+count_sym_ways(N,S):- sym_cbal_trees(N,L),length(L,S).
+
+
+my_split(N,0,0):- N =< 1,!.
+my_split(N,NL,NR):- M is N-1, NR is M//2, NL is M-NR.
+
+count_ways(N,1):- N =< 1,!.
+count_ways(N,W):- my_split(N,L,R), L \= R,
+     count_ways(L,Wl), count_ways(R,Wr), W is 2*Wl*Wr.
+count_ways(N,W):- my_split(N,L,R), L = R,
+     count_ways(L,Wl), count_ways(R,Wr), W is Wl*Wr.

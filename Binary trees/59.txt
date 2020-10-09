@@ -1,0 +1,20 @@
+/*
+P59 (**) Construct height-balanced binary trees
+    In a height-balanced binary tree, the following property holds for every node: The height of its left subtree and the height of its right subtree are almost equal, which means their difference is not greater than one.
+
+    Write a predicate hbal_tree/2 to construct height-balanced binary trees for a given height. The predicate should generate all solutions via backtracking. Put the letter 'x' as information into all nodes of the tree.
+    Example:
+    ?- hbal_tree(3,T).
+    T = t(x, t(x, t(x, nil, nil), t(x, nil, nil)), t(x, t(x, nil, nil), t(x, nil, nil))) ;
+    T = t(x, t(x, t(x, nil, nil), t(x, nil, nil)), t(x, t(x, nil, nil), nil)) ;
+    etc......No
+*/
+
+next_level(1,0,0):-!.
+next_level(N,NL,NR):- NL is N-1, NR is N-1.
+next_level(N,NL,NR):- NL is N-1, NR is N-2.
+next_level(N,NL,NR):- NL is N-2, NR is N-1.
+
+
+hbal_tree(0,'').
+hbal_tree(N,t(x,L,R)):- N>0, next_level(N,NL,NR),hbal_tree(NL,L), hbal_tree(NR,R).

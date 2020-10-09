@@ -1,0 +1,32 @@
+is_mirror(t(_,L,R)):- mirror(L,R).
+
+mirror(nil, nil).
+mirror(t(H,L,R),t(H,X,Y)):- mirror(L,Y), mirror(R,X).
+
+/*
+P57 (**) Binary search trees (dictionaries)
+    Use the predicate add/3, developed in chapter 4 of the course, to write a predicate to construct a binary search tree from a list of integer numbers.
+    Example:
+    ?- construct([3,2,5,7,1],T).
+    T = t(3, t(2, t(1, nil, nil), nil), t(5, nil, t(7, nil, nil)))
+
+    Then use this predicate to test the solution of the problem P56.
+    Example:
+    ?- test_symmetric([5,3,18,1,4,12,21]).
+    Yes
+    ?- test_symmetric([3,2,5,7,4]).
+    No
+*/
+
+add_to(nil,N,t(N,nil,nil)).
+add_to(t(X,L,R),N,t(X,Lt,R)):- N =< X, add_to(L,N,Lt).
+add_to(t(X,L,R),N,t(X,L,Rt)):- N > X, add_to(R,N,Rt).
+
+
+construct(L,X):- iter(L,nil,X).
+
+iter([],X,X).
+iter([H|T],Current,X):- add_to(Current,H,Next), iter(T,Next,X).
+
+
+test_symmetric(L):-construct(L,T), is_mirror(T).

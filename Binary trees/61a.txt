@@ -1,0 +1,10 @@
+/*
+P61A (*) Collect the leaves of a binary tree in a list
+    A leaf is a node with no successors. Write a predicate leaves/2 to collect them in a list.
+
+    % leaves(T,S) :- S is the list of all leaves of the binary tree T 
+*/
+
+leaves(nil,[]).
+leaves(t(X,nil,nil),[X]):-!.
+leaves(t(_,L,R),S):- leaves(L,Sl), leaves(R,Sr), append(Sl,Sr,S).

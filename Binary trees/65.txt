@@ -1,0 +1,22 @@
+/*
+P65 (**) Layout a binary tree (2)
+    An alternative layout method is depicted in the illustration opposite. Find out the rules and write the corresponding Prolog predicate. Hint: On a given level, the horizontal distance between neighboring nodes is constant.
+
+    Use the same conventions as in problem P64 and test your predicate in an appropriate way. 
+*/
+
+maxHeight(nil,0).
+maxHeight(t(_,L,R),H):- maxHeight(L,Hl),maxHeight(R,Hr), Hl >= Hr , H is 1+Hl,!.
+maxHeight(t(_,L,R),H):- maxHeight(L,Hl),maxHeight(R,Hr), Hl <  Hr , H is 1+Hr.
+
+
+layout(T,PT):- maxHeight(T,H), aux(T,PT,H,0,1,_).
+
+aux(t(W,nil,R),t(W,1,Y,nil,R),_,0,Y,1):-!.
+aux(nil,nil,_,_,_,0).
+aux(t(W,L,R), t(W,X,Y,Lr,Rr),H,0,Y,X):- Ynext is Y+1, Hnext is H-1,
+    aux(L,Lr,Hnext,0,Ynext,Xl), X is  Xl + 2**(Hnext-1),
+    aux(R,Rr,H,X,Ynext,_),!.
+aux(t(W,L,R), t(W,X,Y,Lr,Rr),H,Down,Y,X):- Ynext is Y+1, Hnext is H-1,
+    aux(L,Lr,Hnext,Down,Ynext,_), X is 2**(Hnext-1) + Down,
+    aux(R,Rr,Hnext,X,Ynext,_).
